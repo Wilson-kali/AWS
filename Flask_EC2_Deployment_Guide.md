@@ -61,7 +61,7 @@ Once your EC2 instance is running, follow these steps to connect to it from your
 
 2. **Move your .pem file into the ec2 folder.** For example:
 
-     exus-Bloom.pem → C:\Users\<YourUsername>\ec2\Nexus-Bloom.pem
+     Nexus-Bloom.pem → C:\Users\<YourUsername>\ec2\Nexus-Bloom.pem
 
 3. **Open Command Prompt and navigate to the folder:**
 
@@ -79,8 +79,8 @@ Replace <EC2-Public-IP> with your actual EC2 instance's public IP address (e.g.,
 ## ✅ Option 2: Connect via Bash or Terminal (Linux/macOS)
 1. **Move the .pem file to a safe directory:**
    ```bash
-  mkdir ~/ec2
-  mv ~/Downloads/Nexus-Bloom.pem ~/ec2/
+   mkdir ~/ec2
+   mv ~/Downloads/Nexus-Bloom.pem ~/ec2/
 
 2. **Set proper permissions to prevent security warnings:**
 
