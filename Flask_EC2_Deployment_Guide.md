@@ -46,18 +46,41 @@ This guide walks you step-by-step through hosting a Flask backend using an AWS E
 ---
 
 ## 🔐 Step 2: Connect to EC2 via SSH
+Once your EC2 instance is running, follow these steps to connect to it from your local machine using the .pem key file:
 
-Give permission to `.pem` file:
+✅ Option 1: Connect using Command Prompt (Windows)
+Create a folder named ec2 inside your user directory:
 
-```bash
+mkdir C:\Users\<YourUsername>\ec2
+Move your .pem file into the ec2 folder. For example:
+
+Nexus-Bloom.pem → C:\Users\<YourUsername>\ec2\Nexus-Bloom.pem
+
+Open Command Prompt and navigate to the folder:
+
+cd C:\Users\<YourUsername>\ec2
+(Optional) If you are using Git Bash or WSL, you can use the following Unix-style command to set permissions:
+
+
 chmod 400 Nexus-Bloom.pem
-```
+⚠️ On Windows, this step is not always required, but Git Bash or WSL might enforce it.
 
-Then connect:
-
-```bash
+SSH into your instance:
 ssh -i Nexus-Bloom.pem ubuntu@<EC2-Public-IP>
-```
+Replace <EC2-Public-IP> with your actual EC2 instance's public IP address (e.g., 13.221.93.123).
+
+✅ Option 2: Connect via Bash or Terminal (Linux/macOS)
+Move the .pem file to a safe directory:
+
+mkdir ~/ec2
+mv ~/Downloads/Nexus-Bloom.pem ~/ec2/
+Set proper permissions to prevent security warnings:
+
+chmod 400 ~/ec2/Nexus-Bloom.pem
+SSH into the EC2 instance:
+
+ssh -i ~/ec2/Nexus-Bloom.pem ubuntu@<EC2-Public-IP>
+💡 Tip: If your username is different (e.g., for Amazon Linux), replace ubuntu with the appropriate user (ec2-user, admin, etc.).
 
 ---
 
