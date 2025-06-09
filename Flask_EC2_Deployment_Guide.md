@@ -73,7 +73,8 @@ Once your EC2 instance is running, follow these steps to connect to it from your
 ⚠️ On Windows, this step is not always required, but Git Bash or WSL might enforce it.
 
 4. **SSH into your instance:**
-ssh -i Nexus-Bloom.pem ubuntu@<EC2-Public-IP>
+   ```bash
+   ssh -i Nexus-Bloom.pem ubuntu@<EC2-Public-IP>
 Replace <EC2-Public-IP> with your actual EC2 instance's public IP address (e.g., 13.221.93.123).
 
 ## ✅ Option 2: Connect via Bash or Terminal (Linux/macOS)
