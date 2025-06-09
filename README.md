@@ -4,20 +4,12 @@ Welcome to the **AWS** repo! This repository is a central hub for learning, depl
 
 ---
 
-## 📁 Repository Structure
-AWS/
-├── Flask_EC2_Deployment_Guide.md # Detailed steps to deploy Flask on EC2 with Gunicorn + Nginx
-├── ... Will be adding more deployment guides here
-
-
----
-
 ## 📌 What You'll Learn
 
 This repo contains hands-on guides and scripts to:
 
 - 🚀 Launch and manage EC2 instances  
-- 🐍 Deploy Python/Flask applications  
+- 🐍 Deploy Python/Flask applications and other applications which I will be adding later. 
 - 🔐 Configure security groups and SSH access  
 - 🐘 Use Gunicorn as a WSGI server  
 - 🌐 Reverse proxy with Nginx  
