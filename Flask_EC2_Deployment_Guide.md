@@ -143,9 +143,9 @@ Visit:
 http://<EC2-Public-IP>:5000
 ```
 
-## 🌐 Step 7: Configure Nginx
+## 🌐 Step 6: Configure Nginx
 
-# Before We Start Let's Learn NGINX, HTTPS, and Let's Encrypt For A Moment
+# Before We Start Let's Learn NGINX, HTTPS, and Let's Encrypt For A Moment (Skip to set up if you already farmiliar with this)
 
 Let's pause. I want to share something with you for a bit — a story behind the decisions we made deploying this Flask app securely in production with nginx.
 
@@ -235,21 +235,20 @@ sudo nano /etc/nginx/sites-available/nexus-bloom
 
 Paste this config:
 
-```nginx
-server {
-    listen 80;
-    server_name 13.***.9*.1*3.nip.io;
+   ```nginx
+   server {
+      listen 80;
+      server_name 13.***.9*.1*3.nip.io;
 
-    location /.well-known/acme-challenge/ {
-        root /var/www/html;
-    }
+      location /.well-known/acme-challenge/ {
+         root /var/www/html;
+      }
 
-    location / {
-        return 301 https://$host$request_uri;
-    }
-}
+      location / {
+         return 301 https://$host$request_uri;
+      }
+   }
 
----
 
 ## Issue SSL Certificate with Certbot
 
@@ -273,7 +272,6 @@ Certbot will:
 - Create SSL certs and configure NGINX
 - Your /etc/nginx/sites-available/nexus-bloom will contain the code below
 
----
 
 server {
     listen 443 ssl;
@@ -322,7 +320,7 @@ This stack is now **ready for production**, all using free tools — no domain n
 
 ---
 
-# Set up Gunicorn WSGI in Production
+7. **Set up Gunicorn WSGI in Production**
 
 ## What is WSGI?
 
