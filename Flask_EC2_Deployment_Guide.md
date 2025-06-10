@@ -321,6 +321,7 @@ This stack is now **ready for production**, all using free tools — no domain n
 ---
 
 # Step 7: Set up Gunicorn WSGI in Production
+# Using Gunicorn in Production
 
 ## What is WSGI?
 
@@ -354,6 +355,16 @@ Spawning refers to the creation of multiple worker processes by the server. When
 
 ---
 
+## Installing Gunicorn
+
+Install Gunicorn using pip (preferably inside a virtual environment):
+
+```bash
+pip install gunicorn
+```
+
+---
+
 ## How to Run Gunicorn
 
 ```bash
@@ -365,6 +376,55 @@ gunicorn -w 4 -b 127.0.0.1:5000 app:app
 * `app:app`: Refers to the Python file `app.py` and the Flask app instance named `app`
 
 Gunicorn runs your Flask app, and NGINX (on the frontend) handles HTTPS traffic and forwards it to Gunicorn via HTTP.
+
+---
+
+## Setting Up Gunicorn as a Service
+
+To ensure Gunicorn starts automatically on boot and can be managed with `systemctl`, create a `gunicorn.service` file:
+
+```ini
+# /etc/systemd/system/gunicorn.service
+[Unit]
+Description=Gunicorn instance to serve Flask App
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/Nexus-bloom-backend
+Environment="PATH=/home/ubuntu/Nexus-bloom-backend/venv/bin"
+ExecStart=/home/ubuntu/Nexus-bloom-backend/venv/bin/gunicorn -w 4 -b 127.0.0.1:5000 app:app
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start Gunicorn:
+
+```bash
+sudo systemctl enable gunicorn
+sudo systemctl start gunicorn
+sudo systemctl status gunicorn
+```
+
+---
+
+## How Does NGINX Forward to Gunicorn?
+
+In your NGINX configuration:
+
+```nginx
+location /api/ {
+    proxy_pass http://127.0.0.1:5000/api/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+Even though NGINX listens on port **443** for HTTPS traffic, it **forwards the requests** to Gunicorn running on **127.0.0.1:5000**. This separation provides performance and security benefits.
 
 ---
 
@@ -389,10 +449,11 @@ Gunicorn runs your Flask app, and NGINX (on the frontend) handles HTTPS traffic 
 * **HTTPS** prevents frontend-backend security issues
 * **nip.io** offers a free, IP-based domain
 * **Certbot** adds free SSL certificates
+* **systemd** keeps Gunicorn running automatically
 
 This stack is now **ready for production**, fully open-source and budget-friendly — no custom domain needed!
 
-
+---
 - Auto-renew SSL:
 
 ```bash
