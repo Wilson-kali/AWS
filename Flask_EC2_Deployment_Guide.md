@@ -188,6 +188,176 @@ sudo ln -s /etc/nginx/sites-available/nexus-bloom /etc/nginx/sites-enabled
 sudo nginx -t
 sudo systemctl restart nginx
 ```
+# Flask Deployment with NGINX, HTTPS, and Let's Encrypt
+
+This documentation explains how to configure a Flask backend on an AWS EC2 instance using **NGINX** as a reverse proxy, secure it with **Let's Encrypt SSL certificates**, and access it from a custom IP-based domain via **nip.io**. It also highlights why `ngrok` is not used in production.
+
+---
+
+## Why Use HTTPS (SSL Certificates)
+
+HTTPS:
+
+* Encrypts communication between client (browser/Postman) and server
+* Prevents man-in-the-middle attacks
+* Required by modern browsers for API communication
+* Prevents Mixed Content errors (frontend is HTTPS, backend must be too)
+
+Let's Encrypt provides **free SSL certificates** which we can install and automatically renew.
+
+---
+
+## Why Use `nip.io`
+
+We used the domain `13.221.93.123.nip.io` instead of a paid domain for the following reasons:
+
+* **nip.io** is a free wildcard DNS service
+* Maps any subdomain like `13.221.93.123.nip.io` to the IP `13.221.93.123`
+* Works well with Let's Encrypt and Certbot
+* Lets you issue an SSL certificate for a pseudo-domain without purchasing a real one
+
+---
+
+## Why Not Use `ngrok`
+
+While `ngrok` is useful for development:
+
+* It is **not ideal for production** (it's temporary, dynamic, and usage-limited)
+* SSL is provided by ngrok's domain, not yours
+* Not scalable for deployment or integration with Vercel or other services
+* Doesn't allow custom NGINX control or optimization
+
+---
+
+## Setting Up NGINX as a Reverse Proxy
+
+### 1. Install NGINX
+
+```bash
+sudo apt update
+sudo apt install nginx
+```
+
+### 2. Check NGINX Status
+
+```bash
+sudo systemctl status nginx
+```
+
+### 3. Create a Site Config
+
+```bash
+sudo nano /etc/nginx/sites-available/nexus-bloom
+```
+
+Paste the following:
+
+```nginx
+server {
+    listen 80;
+    server_name 13.221.93.123.nip.io;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name 13.221.93.123.nip.io;
+
+    ssl_certificate /etc/letsencrypt/live/13.221.93.123.nip.io/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/13.221.93.123.nip.io/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    location /api/ {
+        proxy_pass http://localhost:5000/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+### 4. Enable Site
+
+```bash
+sudo ln -s /etc/nginx/sites-available/nexus-bloom /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+---
+
+## Obtain SSL Certificate with Certbot
+
+Install Certbot:
+
+```bash
+sudo apt install certbot python3-certbot-nginx
+```
+
+Run Certbot for your domain:
+
+```bash
+sudo certbot --nginx -d 13.221.93.123.nip.io
+```
+
+Certbot will:
+
+* Communicate with Let's Encrypt
+* Place a verification file in `/var/www/html/.well-known/acme-challenge/`
+* Issue and configure certificate automatically
+
+Verify success:
+
+```bash
+sudo systemctl status nginx
+```
+
+---
+
+## Testing the API
+
+Start Flask server:
+
+```bash
+python app.py  # Or gunicorn if in production
+```
+
+Then access:
+
+```
+https://13.221.93.123.nip.io/api/membership/verify-email
+```
+
+Using Postman or frontend.
+
+---
+
+## Summary
+
+* NGINX acts as a **reverse proxy**: Listens on port 443, decrypts SSL, and forwards to Flask on port 5000
+* SSL from Let's Encrypt protects data
+* `nip.io` provides a free DNS workaround for public IPs
+* This setup is **production-ready** without paying for a domain
+
+---
+
+**Next Steps:**
+
+* Set up Gunicorn or uWSGI for better production serving
+* Auto-renew Certbot with:
+
+```bash
+sudo certbot renew --dry-run
+```
 
 ---
 
