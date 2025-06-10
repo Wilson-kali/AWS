@@ -320,7 +320,7 @@ This stack is now **ready for production**, all using free tools — no domain n
 
 ---
 
-7. **Set up Gunicorn WSGI in Production**
+# Set up Gunicorn WSGI in Production
 
 ## What is WSGI?
 
